@@ -1,0 +1,16 @@
+Assignment 1a
+
+General decisions:
+Policies are nffgs' child elements because in this way it's easier to verify the key reference to a node directly through the schema and is not necessary to do it in the application.
+I decided to use elements for data and attributes for meta-data, so I used elements for nffg-specific elements, such as nodes and links, and attributes for features related to them.
+The traversed function of a policy is a child element and not an attribute because it can have more than one value. 
+I tried to keep it as simple as possible, so I avoided to create too many sub elements and used attributes instead.
+
+DTD:
+- The name of nffgs and policies are of "ID" type, so they are unique in the xml file.
+- I didn't create nodes and links of "ID" type because their names are not unique unless you consider a single nffg.
+
+XML:
+- NameType is used in order to have alphanumeric names starting with a letter.
+- Names are unique for nodes and links in a specific nffg.
+- In the application is important to control if a policy is traversal and in that case to check if it has at least a trasversal function defined.

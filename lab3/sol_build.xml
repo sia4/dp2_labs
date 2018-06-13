@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project basedir="." default="build-service" name="NFFG-3-sol-build">
+	<description>
+			Script for NFFG Assignment 3 - Generate classes
+	</description>
+
+	<property name="basedir" location="." />
+
+	<!-- define directories -->
+	<property name="build.dir" location="${basedir}/build" />
+	<property name="schema.dir" location="${basedir}/xsd" />
+	<property name="src.dir" location="${basedir}/src/" />
+	<property name="lib.dir" location="${basedir}/lib" />
+	<property name="gen.dir" location="${basedir}/gen-src/" />
+	<property name="package.dir" location="${src.dir}/it/polito/dp2/NFFG/sol3/" />
+	<property name="service.dir" location="${package.dir}/service" />
+	<property name="client1.dir" location="${package.dir}/client1" />
+	<property name="client2.dir" location="${package.dir}/client2" />
+
+	<!-- The location of the neo web service -->
+	<property name="PORT" value="8080" />
+	<property name="URLNEO" value="http://localhost:${PORT}/Neo4JXML/rest" />
+	<property name="WADLNEO" value="${URLNEO}/application.wadl" />
+	<property name="XSDNEO" value="${WADLNEO}/xsd0.xsd" />
+
+	<!-- The location of the nffgService web service -->
+	<property name="NFFGURL" value="http://localhost:${PORT}/NffgService/rest" />
+	<property name="NFFGWADL" value="${NFFGURL}/application.wadl" />
+	<property name="NFFGXSD" value="${NFFGWADL}/xsd0.xsd" />
+		
+	<!-- Other properties -->
+	<property name="base.package" value="it.polito.dp2.NFFG.sol3" />
+	<property name="service.generated.package" value="${base.package}.service.generated" />
+	<property name="client1.generated.package" value="${base.package}.client1.generated" />
+	<property name="client2.generated.package" value="${base.package}.client2.generated" />
+
+	<!-- Build properties -->
+	<property name="debug" value="true" />
+	<property name="debuglevel" value="source,lines,vars" />
+	<property name="target" value="1.8" />
+	<property name="source" value="1.8" />
+
+	<path id="sol.classpath">
+		<pathelement location="${build.dir}" />
+		<fileset dir="${lib.dir}">
+			<include name="*.jar" />
+		</fileset>
+	</path>
+
+	<target name="build-service" depends="generate-bindings, generate-artifacts-wadl">
+		<echo>Building the service</echo>
+		<javac destdir="${build.dir}" debug="${debug}" debuglevel="${debuglevel}" source="${source}" target="${target}" includeantruntime="false">
+			<src path="${service.dir}" />
+			<src path="${gen.dir}" />
+			<classpath>
+				<path refid="sol.classpath" />
+			</classpath>
+		</javac>
+		<echo>Done.</echo>
+	</target>
+
+	<!-- generate bindings -->
+	<target name="generate-bindings">
+		<mkdir dir="${gen.dir}" />
+		<exec executable="xjc" failonerror="true">
+			<arg value="-d" />
+			<arg value="${gen.dir}" />
+			<arg value="-p" />
+			<arg value="${service.generated.package}.model" />
+			<arg value="${schema.dir}/nffgVerifier.xsd" />
+		</exec>
+		<touch file="${gen.dir}/.flagfile" />
+	</target>
+
+	<!-- define wjc task (WADL to Java) -->
+	<taskdef name="wjc" classname="org.jvnet.ws.wadl2java.WJCTask">
+		<classpath>
+			<fileset dir="${lib.dir}" includes="*.jar" />
+		</classpath>
+	</taskdef>
+
+	<!-- define the client artifacts generation target (from wadl)-->
+	<target name="generate-artifacts-wadl">
+		<mkdir dir="${gen.dir}" />
+		<echo message="Compiling the descriptions..." />
+		<wjc description="${WADLNEO}" package="${service.generated.package}" autoSchemaPackage="false" target="${gen.dir}">
+			<!-- autoSchemaPackage="true" -->
+			<!--  <customizations dir="${root.location}" includes="binding.xjc"/> -->
+			<produces dir="${gen.dir}/it/polito/dp2/NFFG/sol3/service/generated" includes="*.java" />
+			<depends dir="${basedir}" includes="sol_build.xml" />
+		</wjc>
+	</target>
+
+	<!-- clients targets -->
+	<target name="build-client"  depends="generate-bindings-client2, generate-bindings-client1">
+		<echo>Building client 1</echo>
+		<javac destdir="${build.dir}" debug="${debug}" debuglevel="${debuglevel}" source="${source}" target="${target}" includeantruntime="false">
+			<src path="${client1.dir}" />
+			<src path="${gen.dir}" />
+			<classpath>
+				<path refid="sol.classpath" />
+			</classpath>
+		</javac>
+		<echo>Done.</echo>
+		<echo>Building client 2</echo>
+		<javac destdir="${build.dir}" debug="${debug}" debuglevel="${debuglevel}" source="${source}" target="${target}" includeantruntime="false">
+			<src path="${client2.dir}" />
+			<src path="${gen.dir}" />
+			<classpath>
+				<path refid="sol.classpath" />
+			</classpath>
+		</javac>
+		<echo>Done.</echo>
+	</target>
+		
+	<target name="generate-bindings-client2">	
+		<mkdir dir="${gen.dir}" />
+		<exec executable="xjc" failonerror="true">
+			<arg value="-d" />
+			<arg value="${gen.dir}" />
+			<arg value="-p" />
+			<arg value="${client2.generated.package}" />
+			<arg value="${schema.dir}/nffgVerifier.xsd" />
+		</exec>
+		<touch file="${gen.dir}/.flagfile" />
+	</target>
+	
+	<target name="generate-bindings-client1">
+		<mkdir dir="${gen.dir}" />
+		<exec executable="xjc" failonerror="true">
+			<arg value="-d" />
+			<arg value="${gen.dir}" />
+			<arg value="-p" />
+			<arg value="${client1.generated.package}" />
+			<arg value="${schema.dir}/nffgVerifier.xsd" />
+		</exec>
+		<touch file="${gen.dir}/.flagfile" />
+	</target>
+
+</project>

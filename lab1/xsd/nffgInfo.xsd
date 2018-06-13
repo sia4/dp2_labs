@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xsd:schema version="1.0" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+ targetNamespace="http://www.example.org/nffg" xmlns:tns="http://www.example.org/nffg">
+
+	<!-- definition of simple types -->
+	<xsd:simpleType name="nameType">
+		<xsd:restriction base="xsd:string">
+			<xsd:maxLength value="32"/>
+			<xsd:pattern value="[A-Za-z][A-Za-z0-9]*"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	
+	<xsd:simpleType name="dateType">
+		<xsd:restriction base="xsd:dateTime"/>
+	</xsd:simpleType>
+	
+	<xsd:simpleType name="messageType">
+		<xsd:restriction base="xsd:string">
+			<xsd:maxLength value="150"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	
+	<xsd:simpleType name="nodeFunctionalType">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="FW"/>
+			<xsd:enumeration value="DPI"/>
+			<xsd:enumeration value="NAT"/>
+			<xsd:enumeration value="SPAM"/>
+			<xsd:enumeration value="CACHE"/>
+			<xsd:enumeration value="VPN"/>
+			<xsd:enumeration value="WEB_SERVER"/>
+			<xsd:enumeration value="WEB_CLIENT"/>
+			<xsd:enumeration value="MAIL_SERVER"/>
+			<xsd:enumeration value="MAIL_CLIENT"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	
+	<xsd:simpleType name="policyDescType">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="reachability"/>
+			<xsd:enumeration value="traversal"/>
+		</xsd:restriction>
+	</xsd:simpleType>	
+	
+	<!-- definition of complex types -->	
+	<xsd:complexType name="linkType">
+			<xsd:attribute name="name" type="tns:nameType"/>
+			<xsd:attribute name="source" type="tns:nameType"/>
+			<xsd:attribute name="dest" type="tns:nameType"/>
+	</xsd:complexType>
+	
+	<xsd:complexType name="nodeType">
+			<xsd:attribute name="name" type="tns:nameType"/>
+			<xsd:attribute name="node_type" type="tns:nodeFunctionalType"/>
+	</xsd:complexType>
+	
+	<xsd:complexType name="resultType">
+		<xsd:all>
+			<xsd:element name="message" type="tns:messageType"/>
+		</xsd:all>
+		<xsd:attribute name="value" type="xsd:boolean"/>
+		<xsd:attribute name="v_time" type="tns:dateType"/>
+	</xsd:complexType>
+	
+	<xsd:complexType name="NFFGType">
+		<xsd:sequence>
+			<xsd:element name="node" type="tns:nodeType" minOccurs="1" maxOccurs="unbounded"/>
+			<xsd:element name="link" type="tns:linkType" minOccurs="0" maxOccurs="unbounded"/>
+			<xsd:element name="policy" type="tns:policyType" minOccurs="0" maxOccurs="unbounded"/>	
+		</xsd:sequence>
+		<xsd:attribute name="name" type="tns:nameType" use="required"/>
+		<xsd:attribute name="update_time" type="tns:dateType"/>
+	</xsd:complexType>
+	
+	<xsd:complexType name="policyType">
+		<xsd:sequence>
+			<xsd:element name="traversed_func" type="tns:nodeFunctionalType" minOccurs="0" maxOccurs="unbounded"/>
+			<xsd:element name="result" type="tns:resultType" minOccurs="0" maxOccurs="1"/>
+		</xsd:sequence>
+		<xsd:attribute name="name" type="tns:nameType"/>
+		<xsd:attribute name="source" type="tns:nameType"/>
+		<xsd:attribute name="dest" type="tns:nameType"/>
+		<xsd:attribute name="value" type="xsd:boolean"/>
+		<xsd:attribute name="type" type="tns:policyDescType"/>
+	</xsd:complexType>
+	
+	<!-- definition of serviceProvider element -->
+	<xsd:element name="serviceProvider">
+		<xsd:complexType>
+			<xsd:sequence>
+				<!-- definition of nffg element -->
+				<xsd:element name="nffg" type="tns:NFFGType" minOccurs="0" maxOccurs="unbounded">
+					<xsd:key name="nodeKey">
+						<xsd:selector xpath="node"/>
+						<xsd:field xpath="@name"/>
+					</xsd:key>
+					<xsd:key name="linkKey">
+						<xsd:selector xpath="link"/>
+						<xsd:field xpath="@name"/>
+					</xsd:key>
+				    <xsd:keyref name="linkSourceRef" refer="tns:nodeKey">
+						<xsd:selector xpath="link"/>
+						<xsd:field xpath="@source"/>	
+					</xsd:keyref>
+					<xsd:keyref name="linkDestRef" refer="tns:nodeKey">
+						<xsd:selector xpath="link"/>
+						<xsd:field xpath="@dest"/>				
+					</xsd:keyref>
+					<xsd:key name="policyKey">
+						<xsd:selector xpath="policy"/>
+						<xsd:field xpath="@name"/>
+					</xsd:key>
+					<xsd:keyref name="policySourceRef" refer="tns:nodeKey">
+						<xsd:selector xpath="policy"/>
+						<xsd:field xpath="@source"/>	
+					</xsd:keyref>
+					<xsd:keyref name="policyDestRef" refer="tns:nodeKey">
+						<xsd:selector xpath="policy"/>
+						<xsd:field xpath="@dest"/>				
+					</xsd:keyref>
+				</xsd:element>
+			</xsd:sequence>
+		</xsd:complexType>
+		<xsd:key name="hffgKey">
+			<xsd:selector xpath="nffg"/>
+			<xsd:field xpath="@name"/>
+		</xsd:key>
+	</xsd:element>
+</xsd:schema>
+

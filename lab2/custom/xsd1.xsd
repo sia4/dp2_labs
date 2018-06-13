@@ -1,0 +1,66 @@
+<?xml version="1.0" standalone="yes"?>
+<xs:schema elementFormDefault="qualified" version="1.0" targetNamespace="http://www.example.org/Neo4J" xmlns:tns="http://www.example.org/Neo4J" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+<!-- Complex types --> 
+   <xs:complexType name="Property">
+    <xs:sequence/>
+    <xs:attribute name="name" type="xs:string" use="required"/>
+    <xs:attribute name="value" type="xs:string" use="required"/>
+  </xs:complexType>
+
+  <xs:complexType name="Path">
+    <xs:sequence>
+      <xs:element name="node" type="xs:string" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="relationship" type="xs:string" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+    <xs:attribute name="dstNode" type="xs:string" use="required"/>
+    <xs:attribute name="srcNode" type="xs:string" use="required"/>
+    <xs:attribute name="length" type="xs:long"/>
+  </xs:complexType>
+    
+<!-- Elements -->
+  <xs:element name="labels">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="value" type="xs:string" maxOccurs="unbounded"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="node">
+      <xs:complexType>
+      <xs:sequence>
+        <xs:element name="property" type="tns:Property" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+        <xs:element ref="tns:labels" minOccurs="0"/>
+      </xs:sequence>
+      <xs:attribute name="id" type="xs:string"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="nodes">
+    <xs:complexType>
+      <xs:sequence>
+       	<xs:element ref="tns:node" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="paths">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="path" type="tns:Path" maxOccurs="1"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="relationship">
+    <xs:complexType>
+      <xs:sequence/>
+      <xs:attribute name="dstNode" type="xs:string" use="required"/>
+      <xs:attribute name="type" type="xs:string" use="required"/>
+      <xs:attribute name="srcNode" type="xs:string"/>
+      <xs:attribute name="id" type="xs:string"/>
+    </xs:complexType>
+  </xs:element>
+
+</xs:schema>

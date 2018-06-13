@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project basedir="." default="generate-artifacts" name="NFFG-2-sol-build">
+	<description>
+			Script for NFFG Assignment 2 - Generate classes
+	</description>
+
+	<property name="lab2.location" location="." />
+
+	<!-- define directories -->
+	<property name="gen.dir" location="${lab2.location}/gen-src" />
+	<property name="lib.dir" location="${lab2.location}/lib" />
+
+	<!-- The location of the ... web service -->
+	<property name="PORT" value="8080" />
+	<property name="URL" value="http://localhost:${PORT}/Neo4JXML/rest" />
+	<property name="WADL" value="${URL}/application.wadl" />
+	<property name="XSD" value="${WADL}/xsd0.xsd" />
+
+	<!-- define wjc task (WADL to Java) -->
+	<taskdef name="wjc" classname="org.jvnet.ws.wadl2java.WJCTask">
+		<classpath>
+			<fileset dir="${lib.dir}" includes="*.jar" />
+		</classpath>
+	</taskdef>
+
+	<!-- define the client artifacts generation target (from wadl)-->
+	<target name="generate-artifacts-wadl">
+		<mkdir dir="${gen.dir}" />
+		<echo message="Compiling the descriptions..." />
+		<wjc description="${WADL}" package="it.polito.dp2.NFFG.sol2.server" autoSchemaPackage="false" target="${gen.dir}">
+			<!-- autoSchemaPackage="true" -->
+			<!--  <customizations dir="${root.location}" includes="binding.xjc"/> -->
+			<produces dir="${gen.dir}/it/polito/dp2/NFFG/sol2/server" includes="*.java" />
+			<depends dir="${lab2.location}" includes="sol_build.xml" />
+		</wjc>
+	</target>
+	
+	<!-- define the client artifacts generation target (using xjc)-->
+	<target name="generate-artifacts" description="Generate bindings from schema">
+		<mkdir dir="${gen.dir}" />
+		<exec executable="xjc" failonerror="true" >
+			<arg value="-d" />
+			<arg value="${gen.dir}" />
+			<arg value="-p" />
+			<arg value="it.polito.dp2.NFFG.sol2.server" />
+			<arg value="${lab2.location}/custom/xsd1.xsd" />
+		</exec>
+		<touch file="${gen.dir}/.flagfile" />
+	</target>
+
+
+</project>

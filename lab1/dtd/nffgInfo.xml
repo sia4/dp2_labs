@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<!DOCTYPE serviceProvider SYSTEM "nffgInfo.dtd">
+<serviceProvider>
+	<nffg name="nffg1" update_time="2016-09-25T17:45:20.000+02:00">
+		<node name="webClient1" node_type="WEB_CLIENT"/>
+		<node name="NAT1" node_type="NAT"/>
+		<node name="firewall1" node_type="FW"/>
+		<node name="webServer1" node_type="WEB_SERVER"/>
+		<link name="link1" source="webClient1" dest="NAT1"/>
+		<link name="link2" source="NAT1" dest="firewall1"/>
+		<link name="link3" source="firewall1" dest="webServer1"/>
+		<policy name="policy1" source="webClient1" dest="webServer1" 
+			value="true" type="reachability">
+			<result value="true" v_time="2016-09-25T17:46:20.000+02:00">
+				<message>The policy is satisfied</message>
+			</result>
+	</policy>
+	</nffg>
+	<nffg name="nffg2" update_time="2016-09-25T17:45:20.000+02:00">
+		<node name="webClient3" node_type="WEB_CLIENT"/>
+		<node name="NAT3" node_type="NAT"/>
+		<node name="firewall3" node_type="FW"/>
+		<node name="webServer3" node_type="WEB_SERVER"/>
+		<link name="link5" source="webClient3" dest="NAT3"/>
+		<link name="link6" source="NAT3" dest="firewall3"/>
+		<link name="link4" source="firewall3" dest="webServer3"/>
+		<policy name="policy2" source="webClient3" dest="webServer3" 
+			value="true" type="traversal">
+			<traversed_func type="FW"/>
+			<result value="true" v_time="2016-09-25T17:46:20.000+02:00">
+				<message>The policy is satisfied</message>
+			</result>
+		</policy>
+	</nffg>
+</serviceProvider>

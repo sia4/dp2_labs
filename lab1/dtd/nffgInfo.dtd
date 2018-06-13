@@ -1,0 +1,34 @@
+<!-- DTD for Network Function-Forwarding Graph -->
+<!ELEMENT serviceProvider (nffg)*>
+<!ELEMENT nffg (node|link|policy)*>
+<!ATTLIST nffg 
+			name		ID		#REQUIRED
+			update_time CDATA 	#IMPLIED>
+<!ELEMENT node EMPTY>
+<!ATTLIST node 
+			name 	CDATA		#REQUIRED
+			node_type	(FW|DPI|NAT|SPAM|CACHE|VPN|WEB_SERVER|WEB_CLIENT
+			|MAIL_SERVER|MAIL_CLIENT)	#REQUIRED>
+<!ELEMENT link EMPTY>
+<!ATTLIST link 
+			name	CDATA	#REQUIRED
+			source	CDATA 	#REQUIRED
+			dest	CDATA 	#REQUIRED>
+<!ELEMENT policy (traversed_func|result)*>
+<!ATTLIST policy
+			name 	ID							#REQUIRED
+			source	CDATA 						#REQUIRED
+			dest	CDATA 						#REQUIRED
+			value	(true|false)				#REQUIRED
+			type	(reachability|traversal) 	#REQUIRED>		
+<!ELEMENT traversed_func EMPTY>
+<!ATTLIST traversed_func
+			type (FW|DPI|NAT|SPAM|CACHE|VPN|WEB_SERVER|WEB_CLIENT
+			|MAIL_SERVER|MAIL_CLIENT)   		#REQUIRED>
+<!ELEMENT result (message)>
+<!ATTLIST result
+			value	(true|false)				#REQUIRED
+			v_time	CDATA						#REQUIRED>
+<!ELEMENT message (#PCDATA)>
+			
+			
